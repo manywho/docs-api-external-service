@@ -1,0 +1,1178 @@
+openapi: 3.0.1
+info:
+  description: |
+    The External Service API is a generic set of endpoint definitions, used to provide an interface for the Boomi Flow platform to talk to a third-party service. It it split into multiple sections, and only a subset are required for a service to be seen as valid by the platform.
+
+    At a minimum, a service must implement the `/metadata` endpoint, which is used to provide the platform with a description of the service and what it supports.
+
+    You can easily implement a service using either our [Java SDK](https://manywho.github.io/sdk-java/), which supports the entire API, or the [Boomi Atomsphere platform](https://boomi.com/platform/), which natively supports a subset of the API.
+  version: 1.0.0
+  title: External Service API
+  contact:
+    email: support@manywho.com
+tags:
+  - name: Authentication
+    description: Authenticate users, and provide basic information about them
+  - name: Authorization
+    description: Authorize user access, based on specified criteria
+  - name: Database
+    description: Provide CRUD operations for specific types in flows
+  - name: Files
+    description: Provide file operations to flows
+  - name: Listeners
+    description: Listen for events on specific values in flows
+  - name: Message Actions
+    description: Provide basic input/output functions
+  - name: Metadata
+    description: Describe the operations and types available in a service
+paths:
+  /actions/{name}:
+    post:
+      tags:
+        - Message Actions
+      operationId: executeAction
+      parameters:
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceResponse'
+  /authentication:
+    post:
+      tags:
+        - Authentication
+      operationId: authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthenticationCredentials'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticatedWhoResult'
+  /authorization:
+    post:
+      tags:
+        - Authorization
+      operationId: authorization
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObjectDataRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectDataResponse'
+  /authorization/group:
+    post:
+      tags:
+        - Authorization
+      operationId: groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObjectDataRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectDataResponse'
+  /authorization/group/attribute:
+    post:
+      tags:
+        - Authorization
+      operationId: groupAttributes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObjectDataRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectDataResponse'
+  /authorization/user:
+    post:
+      tags:
+        - Authorization
+      operationId: users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObjectDataRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectDataResponse'
+  /authorization/user/attribute:
+    post:
+      tags:
+        - Authorization
+      operationId: userAttributes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObjectDataRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectDataResponse'
+  /data:
+    put:
+      tags:
+        - Database
+      operationId: save
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObjectDataRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectDataResponse'
+    post:
+      tags:
+        - Database
+      operationId: load_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObjectDataRequest'
+        required: true
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectDataResponse'
+  /data/delete:
+    post:
+      tags:
+        - Database
+      operationId: delete_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObjectDataRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectDataResponse'
+  /file/content:
+    post:
+      tags:
+        - Files
+      operationId: uploadFile
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MultipartInput'
+          application/octet-stream:
+            schema:
+              $ref: '#/components/schemas/MultipartInput'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectDataResponse'
+  /file/delete:
+    post:
+      tags:
+        - Files
+      operationId: deleteFile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileDataRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectDataResponse'
+  /file/file:
+    post:
+      tags:
+        - Files
+      operationId: loadFiles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileDataRequest'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObjectDataResponse'
+  /listener:
+    post:
+      tags:
+        - Listeners
+      operationId: create_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListenerServiceRequest'
+        required: true
+      responses:
+        default:
+          description: default response
+          content:
+            application/json: {}
+  /metadata:
+    post:
+      tags:
+        - Metadata
+      operationId: describe_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DescribeServiceRequest'
+        required: true
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DescribeServiceResponse'
+components:
+  schemas:
+    AuthenticatedWhoResult:
+      type: object
+      properties:
+        userId:
+          type: string
+        email:
+          type: string
+        username:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        directoryId:
+          type: string
+        directoryName:
+          type: string
+        tenantName:
+          type: string
+        tenantId:
+          type: string
+          format: uuid
+        identityProvider:
+          type: string
+        token:
+          type: string
+        status:
+          type: string
+          enum:
+          - ACCESS_DENIED
+          - AUTHENTICATED
+        statusMessage:
+          type: string
+        culture:
+          $ref: '#/components/schemas/Culture'
+    AuthenticationCredentials:
+      required:
+      - configurationValues
+      type: object
+      properties:
+        configurationValues:
+          type: array
+          items:
+            $ref: '#/components/schemas/EngineValue'
+        authenticationType:
+          type: string
+          enum:
+          - USERNAME_PASSWORD
+          - OAUTH
+          - OAUTH2
+          - SAML
+        username:
+          type: string
+        password:
+          type: string
+        token:
+          type: string
+        code:
+          type: string
+        verifier:
+          type: string
+        sessionToken:
+          type: string
+        sessionUrl:
+          type: string
+        loginUrl:
+          type: string
+        redirectUri:
+          type: string
+        instanceUrl:
+          type: string
+        tenantId:
+          type: string
+          format: uuid
+    Authorization:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/Group'
+        runningAuthenticationId:
+          type: string
+        globalAuthenticationType:
+          type: string
+          enum:
+          - PUBLIC
+          - ALL_USERS
+          - SPECIFIED
+    Command:
+      type: object
+      properties:
+        commandType:
+          type: string
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+    Culture:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        developerName:
+          type: string
+        developerSummary:
+          type: string
+        brand:
+          type: string
+        language:
+          type: string
+        country:
+          type: string
+        variant:
+          type: string
+    DescribeServiceActionResponse:
+      type: object
+      properties:
+        uriPart:
+          type: string
+        serviceInputs:
+          type: array
+          items:
+            $ref: '#/components/schemas/DescribeValue'
+        serviceOutputs:
+          type: array
+          items:
+            $ref: '#/components/schemas/DescribeValue'
+        developerName:
+          type: string
+        developerSummary:
+          type: string
+        serviceActionOutcomes:
+          type: array
+          items:
+            $ref: '#/components/schemas/DescribeUIServiceActionOutcome'
+        isViewMessageAction:
+          type: boolean
+    DescribeServiceInstall:
+      type: object
+      properties:
+        typeElements:
+          type: array
+          items:
+            $ref: '#/components/schemas/TypeElement'
+    DescribeServiceRequest:
+      type: object
+      properties:
+        culture:
+          $ref: '#/components/schemas/Culture'
+        uri:
+          type: string
+        configurationValues:
+          type: array
+          items:
+            $ref: '#/components/schemas/EngineValue'
+    DescribeServiceResponse:
+      type: object
+      properties:
+        culture:
+          $ref: '#/components/schemas/Culture'
+        uri:
+          type: string
+        configurationValues:
+          type: array
+          items:
+            $ref: '#/components/schemas/DescribeValue'
+        providesAutoBinding:
+          type: boolean
+        providesDatabase:
+          type: boolean
+        providesFiles:
+          type: boolean
+        providesIdentity:
+          type: boolean
+        providesListening:
+          type: boolean
+        providesLogic:
+          type: boolean
+        providesNotifications:
+          type: boolean
+        providesSmartSave:
+          type: boolean
+        providesSocial:
+          type: boolean
+        providesSharing:
+          type: boolean
+        providesViews:
+          type: boolean
+        providesVoting:
+          type: boolean
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/DescribeServiceActionResponse'
+        install:
+          $ref: '#/components/schemas/DescribeServiceInstall'
+    DescribeUIServiceActionOutcome:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        developerName:
+          type: string
+        developerSummary:
+          type: string
+    DescribeValue:
+      type: object
+      properties:
+        developerName:
+          type: string
+        contentValue:
+          type: string
+        contentType:
+          type: string
+          enum:
+          - ContentBoolean
+          - ContentContent
+          - ContentDateTime
+          - ContentEncrypted
+          - ContentList
+          - ContentNumber
+          - ContentObject
+          - ContentPassword
+          - ContentString
+        typeElementDeveloperName:
+          type: string
+        ordinal:
+          type: integer
+          format: int32
+        required:
+          type: boolean
+    EngineValue:
+      type: object
+      properties:
+        valueElementId:
+          type: string
+          format: uuid
+        typeElementId:
+          type: string
+          format: uuid
+        typeElementPropertyId:
+          type: string
+          format: uuid
+        developerName:
+          type: string
+        typeElementDeveloperName:
+          type: string
+        typeElementPropertyDeveloperName:
+          type: string
+        contentValue:
+          type: string
+        contentType:
+          type: string
+          enum:
+          - ContentBoolean
+          - ContentContent
+          - ContentDateTime
+          - ContentEncrypted
+          - ContentList
+          - ContentNumber
+          - ContentObject
+          - ContentPassword
+          - ContentString
+        objectData:
+          type: array
+          items:
+            $ref: '#/components/schemas/MObject'
+    FileDataRequest:
+      type: object
+      properties:
+        stateId:
+          type: string
+          format: uuid
+        serviceElementId:
+          type: string
+          format: uuid
+        token:
+          type: string
+        authorization:
+          $ref: '#/components/schemas/Authorization'
+        configurationValues:
+          type: array
+          items:
+            $ref: '#/components/schemas/EngineValue'
+        culture:
+          $ref: '#/components/schemas/Culture'
+        resourcePath:
+          type: string
+        resourceFile:
+          type: string
+        listFilter:
+          $ref: '#/components/schemas/FileListFilter'
+    FileListFilter:
+      type: object
+      properties:
+        orderByPropertyDeveloperName:
+          type: string
+        orderByDirectionType:
+          type: string
+        limit:
+          type: integer
+          format: int32
+        offset:
+          type: integer
+          format: int32
+        search:
+          type: string
+    Group:
+      type: object
+      properties:
+        authenticationId:
+          type: string
+        attribute:
+          type: string
+    GroupAuthorization:
+      type: object
+      properties:
+        serviceElementId:
+          type: string
+          format: uuid
+        globalAuthenticationType:
+          type: string
+        streamBehaviourType:
+          type: string
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/GroupAuthorizationGroup'
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/GroupAuthorizationUser'
+        locations:
+          type: array
+          items:
+            $ref: '#/components/schemas/GroupAuthorizationLocation'
+    GroupAuthorizationGroup:
+      type: object
+      properties:
+        authenticationId:
+          type: string
+        attribute:
+          type: string
+    GroupAuthorizationLocation:
+      type: object
+      properties:
+        developerName:
+          type: string
+        developerSummary:
+          type: string
+        valueElementToReferenceId:
+          $ref: '#/components/schemas/ValueElementId'
+        attribute:
+          type: string
+    GroupAuthorizationUser:
+      type: object
+      properties:
+        authenticationId:
+          type: string
+        attribute:
+          type: string
+        runningUser:
+          type: boolean
+    InputPart:
+      type: object
+      properties:
+        mediaType:
+          type: object
+          properties:
+            type:
+              type: string
+            subtype:
+              type: string
+            parameters:
+              type: object
+              additionalProperties:
+                type: string
+            wildcardType:
+              type: boolean
+            wildcardSubtype:
+              type: boolean
+        headers:
+          type: object
+          properties:
+            empty:
+              type: boolean
+          additionalProperties:
+            type: array
+            items:
+              type: string
+        bodyAsString:
+          type: string
+        contentTypeFromMessage:
+          type: boolean
+    ListenerServiceRequest:
+      required:
+      - listenType
+      - valueForListening
+      type: object
+      properties:
+        token:
+          type: string
+        tenantId:
+          type: string
+          format: uuid
+        stateId:
+          type: string
+          format: uuid
+        callbackUri:
+          type: string
+        culture:
+          $ref: '#/components/schemas/Culture'
+        executionMode:
+          type: string
+          enum:
+          - ""
+          - DEBUG
+          - DEBUG_STEPTHROUGH
+          - RECORD
+        configurationValues:
+          type: array
+          items:
+            $ref: '#/components/schemas/EngineValue'
+        authorization:
+          $ref: '#/components/schemas/GroupAuthorization'
+        attributes:
+          type: object
+          additionalProperties:
+            type: string
+        listenType:
+          maxLength: 2147483647
+          minLength: 1
+          type: string
+        valueForListening:
+          $ref: '#/components/schemas/EngineValue'
+        debugMode:
+          type: boolean
+    ListFilter:
+      type: object
+      properties:
+        comparisonType:
+          type: string
+          enum:
+          - ""
+          - AND
+          - OR
+        where:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListFilterWhere'
+        listFilters:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListFilterMinimal'
+        id:
+          type: string
+        filterByProvidedObjects:
+          type: boolean
+        orderByPropertyDeveloperName:
+          type: string
+        orderByDirectionType:
+          type: string
+          enum:
+          - ""
+          - ASC
+          - DESC
+        limit:
+          type: integer
+          format: int32
+        offset:
+          type: integer
+          format: int32
+        search:
+          type: string
+        searchCriteria:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchCriteria'
+        orderBy:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderBy'
+    ListFilterMinimal:
+      type: object
+      properties:
+        comparisonType:
+          type: string
+          enum:
+          - ""
+          - AND
+          - OR
+        where:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListFilterWhere'
+    ListFilterWhere:
+      type: object
+      properties:
+        columnName:
+          type: string
+        criteriaType:
+          type: string
+          enum:
+          - EQUAL
+          - NOT_EQUAL
+          - GREATER_THAN
+          - GREATER_THAN_OR_EQUAL
+          - LESS_THAN
+          - LESS_THAN_OR_EQUAL
+          - CONTAINS
+          - STARTS_WITH
+          - ENDS_WITH
+          - IS_EMPTY
+        value:
+          type: string
+        contentValue:
+          type: string
+        objectData:
+          type: array
+          items:
+            $ref: '#/components/schemas/MObject'
+    MObject:
+      type: object
+      properties:
+        internalId:
+          type: string
+          format: uuid
+        externalId:
+          type: string
+        developerName:
+          type: string
+        typeElementId:
+          type: string
+          format: uuid
+        order:
+          type: integer
+          format: int32
+        properties:
+          type: array
+          items:
+            $ref: '#/components/schemas/Property'
+        isSelected:
+          type: boolean
+    MultipartInput:
+      type: object
+      properties:
+        parts:
+          type: array
+          items:
+            $ref: '#/components/schemas/InputPart'
+        preamble:
+          type: string
+    ObjectDataRequest:
+      type: object
+      properties:
+        stateId:
+          type: string
+          format: uuid
+        token:
+          type: string
+        typeElementBindingId:
+          type: string
+          format: uuid
+        authorization:
+          $ref: '#/components/schemas/Authorization'
+        configurationValues:
+          type: array
+          items:
+            $ref: '#/components/schemas/EngineValue'
+        command:
+          $ref: '#/components/schemas/Command'
+        culture:
+          $ref: '#/components/schemas/Culture'
+        listFilter:
+          $ref: '#/components/schemas/ListFilter'
+        objectDataType:
+          $ref: '#/components/schemas/ObjectDataType'
+        objectData:
+          type: array
+          items:
+            $ref: '#/components/schemas/MObject'
+    ObjectDataResponse:
+      type: object
+      properties:
+        culture:
+          $ref: '#/components/schemas/Culture'
+        objectData:
+          type: array
+          items:
+            $ref: '#/components/schemas/MObject'
+        hasMoreResults:
+          type: boolean
+    ObjectDataType:
+      type: object
+      properties:
+        typeElementId:
+          type: string
+          format: uuid
+        developerName:
+          type: string
+        properties:
+          type: array
+          items:
+            $ref: '#/components/schemas/ObjectDataTypeProperty'
+    ObjectDataTypeProperty:
+      type: object
+      properties:
+        developerName:
+          type: string
+        list:
+          type: array
+          items:
+            $ref: '#/components/schemas/ObjectDataType'
+    OrderBy:
+      type: object
+      properties:
+        columnName:
+          type: string
+        direction:
+          type: string
+    OutcomeResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        developerName:
+          type: string
+        label:
+          type: string
+        order:
+          type: integer
+          format: int32
+        pageActionBindingType:
+          type: string
+        pageActionType:
+          type: string
+        pageObjectBindingId:
+          type: string
+          format: uuid
+        isBulkAction:
+          type: boolean
+        isOut:
+          type: boolean
+    Property:
+      type: object
+      properties:
+        typeElementPropertyId:
+          type: string
+          format: uuid
+        developerName:
+          type: string
+        contentType:
+          type: string
+          enum:
+          - ContentBoolean
+          - ContentContent
+          - ContentDateTime
+          - ContentEncrypted
+          - ContentList
+          - ContentNumber
+          - ContentObject
+          - ContentPassword
+          - ContentString
+        contentValue:
+          type: string
+        contentFormat:
+          type: string
+    SearchCriteria:
+      type: object
+      properties:
+        columnName:
+          type: string
+    ServiceRequest:
+      type: object
+      properties:
+        token:
+          type: string
+        tenantId:
+          type: string
+          format: uuid
+        stateId:
+          type: string
+          format: uuid
+        callbackUri:
+          type: string
+        culture:
+          $ref: '#/components/schemas/Culture'
+        executionMode:
+          type: string
+          enum:
+          - ""
+          - DEBUG
+          - DEBUG_STEPTHROUGH
+          - RECORD
+        configurationValues:
+          type: array
+          items:
+            $ref: '#/components/schemas/EngineValue'
+        authorization:
+          $ref: '#/components/schemas/GroupAuthorization'
+        attributes:
+          type: object
+          additionalProperties:
+            type: string
+        joinPlayerUri:
+          type: string
+        playerUri:
+          type: string
+        uri:
+          type: string
+        inputs:
+          type: array
+          items:
+            $ref: '#/components/schemas/EngineValue'
+        outcomes:
+          type: array
+          items:
+            $ref: '#/components/schemas/OutcomeResponse'
+        debugMode:
+          type: boolean
+    ServiceResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        tenantId:
+          type: string
+          format: uuid
+        culture:
+          $ref: '#/components/schemas/Culture'
+        rootFaults:
+          type: object
+          additionalProperties:
+            type: string
+        invokeType:
+          type: string
+          enum:
+          - DONE
+          - FORWARD
+          - JOIN
+          - NAVIGATE
+          - STATUS
+          - SUCCESS
+          - SYNC
+          - TOKEN_COMPLETED
+          - WAIT
+          - BUSY
+        waitMessage:
+          type: string
+        outputs:
+          type: array
+          items:
+            $ref: '#/components/schemas/EngineValue'
+        selectedOutcomeId:
+          type: string
+          format: uuid
+        valueFaults:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValueFault'
+        mode:
+          type: string
+    TypeElement:
+      type: object
+      properties:
+        elementType:
+          type: string
+        developerName:
+          type: string
+        developerSummary:
+          type: string
+        id:
+          type: string
+          format: uuid
+        serviceElementId:
+          type: string
+          format: uuid
+        properties:
+          type: array
+          items:
+            $ref: '#/components/schemas/TypeElementProperty'
+        bindings:
+          type: array
+          items:
+            $ref: '#/components/schemas/TypeElementBinding'
+        updateByName:
+          type: boolean
+    TypeElementBinding:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        developerName:
+          type: string
+        developerSummary:
+          type: string
+        databaseTableName:
+          type: string
+        serviceElementId:
+          type: string
+          format: uuid
+        propertyBindings:
+          type: array
+          items:
+            $ref: '#/components/schemas/TypeElementPropertyBinding'
+    TypeElementProperty:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        developerName:
+          type: string
+        contentFormat:
+          type: string
+        contentType:
+          type: string
+          enum:
+          - ContentBoolean
+          - ContentContent
+          - ContentDateTime
+          - ContentEncrypted
+          - ContentList
+          - ContentNumber
+          - ContentObject
+          - ContentPassword
+          - ContentString
+        typeElementId:
+          type: string
+          format: uuid
+        typeElementDeveloperName:
+          type: string
+    TypeElementPropertyBinding:
+      type: object
+      properties:
+        databaseFieldName:
+          type: string
+        typeElementPropertyId:
+          type: string
+          format: uuid
+        typeElementPropertyDeveloperName:
+          type: string
+        databaseContentType:
+          type: string
+    User:
+      type: object
+      properties:
+        authenticationId:
+          type: string
+        attribute:
+          type: string
+        runningUser:
+          type: boolean
+    ValueElementId:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        typeElementPropertyId:
+          type: string
+          format: uuid
+    ValueFault:
+      type: object
+      properties:
+        valueElementToReferenceId:
+          type: string
+          format: uuid
+        valueElementTypeElementPropertyToReferenceId:
+          type: string
+          format: uuid
+        faultCode:
+          type: string
+        faultMessage:
+          type: string
