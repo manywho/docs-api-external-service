@@ -53,6 +53,30 @@ paths:
     post:
       tags:
         - Authentication
+      summary: Authenticate a user
+      description: |
+        This endpoint should authenticate a user, using any of the provided credentials.
+        
+        Common authentication methods include:
+          * OAuth 1.0a, which should be provided the `token` and `verifier` parameters
+          * OAuth 2.0 (Authorization Code flow), which should be provided the `code` and `redirectUri` parameters
+          * SAML, which should be provided the `code` and `redirectUri` parameters
+          * Username/Password, which should be provided the `username` and `password` parameters
+          
+        Once the user has been appropriately authenticated by the service, an `AuthenticatedWhoResult` object must be returned with the following fields set at a minimum:
+          * `directoryId`: The unique identifier for the directory the user authenticated against
+          * `directoryName`: The name of the directory the user authenticated against
+          * `email`: The email address of the user (used by Flow to uniquely identify users across different identity services)
+          * `firstName`: The first/given name of the user
+          * `identityProvider`: A name or unique identifier for the identity provider (usually the name of the service)
+          * `lastName`: The last/family name of the user
+          * `status`: One of either `ACCESS_DENIED` or `AUTHENTICATED`
+          * `token`: A unique token to identity the current user's session, which will be provided to the service in any subsequent requests for the purposes of identifying the current user
+          * `userId`: The unique identifier for the user in the identity provider
+          * `username`: A unique login identifier for the user in the identity provider (usually the same as `email`, unless the IdP provides a separate username)
+          
+        If the user could not be successfully authenticated, an `AuthenticatedWhoResult` object must be returned with the following fields set:
+          * `status`: With a value of `ACCESS_DENIED`
       operationId: authentication
       requestBody:
         content:
